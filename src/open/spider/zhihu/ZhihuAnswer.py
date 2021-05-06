@@ -4,9 +4,9 @@
 #     Date    :  2021/5/6 0:16
 #     Usage   :  
 class ZhihuAnswer:
-    def __init__(self):
-        self.content = ''
-        self.id = ''
+    def __init__(self,ansId,content):
+        self.content = content
+        self.ansId = ansId
 
 def main():
     print('Hello world!')
