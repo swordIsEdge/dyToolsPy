@@ -8,13 +8,18 @@ import json
 import html2text
 
 
-def parser_single(ans):
-    ansId = ans['id']
-    authorName = ans['author']['name']
-    htmlContent = ans['content']
-    markContent = html2text.html2text(htmlContent)
-    content = '**'+authorName + '**\n\n' + markContent+'\n\n----\n'
-    return ZhihuAnswer(ansId, content)
+def parser_single(ans)->ZhihuAnswer:
+    try:
+        ansId = ans['id']
+        authorName = ans['author']['name']
+        htmlContent = ans['content']
+        markContent = html2text.html2text(htmlContent)
+        content = '**作者： ' + authorName + '**  \n\n**内容：**  \n\n' + markContent + '\n\n----\n'
+        return ZhihuAnswer(ansId, content)
+    except Exception as e:
+        ansId = 0
+        content = e.__str__()
+        return ZhihuAnswer(ansId, content)
 
 
 def parser_page(pageJsonStr: str) -> ([ZhihuAnswer], bool):
