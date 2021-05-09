@@ -4,7 +4,7 @@ from random import randint
 
 
 class RandomSleepSecondGen:
-    def __init__(self, min, max, mulProb=2, mulRate=5):
+    def __init__(self, min, max, mulProb=3, mulRate=5):
         self.min = min
         self.max = max
         self.mulProb = mulProb

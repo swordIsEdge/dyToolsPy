@@ -15,42 +15,44 @@ from traceback import print_exc
 
 PAGE_SIZE = 20
 
+questionTitle = ''
+questionUrl = ''
+
 
 def parserQuestionTitle(jsonStr: str):
     jsonObj = json.loads(jsonStr)
     ques = jsonObj['data'][0]['question']
-    title = ques['title']
-    url = ques['url']
-    titleMark = '# QUESTION  \n\n**' + title + '**  \n' + '[' + title + '](' + url + ')\n\n'
-    return titleMark
+    global questionTitle, questionUrl
+    questionTitle = ques['title']
+    questionUrl = ques['url']
+    print('download question ' + questionTitle)
 
 
-def downloadQuestionPage(questionId: int, page: int) -> ([ZhihuAnswer], bool, str):
+def downloadQuestionPage(questionId: int, page: int) -> ([ZhihuAnswer], bool):
     """
     :param questionId:
     :param page:
     :return: (answerList, hasNextPage)
     """
     offset = page * PAGE_SIZE
-    url = f'https://www.zhihu.com/api/v4/questions/{questionId}/answers?include=content&limit=20&offset={offset}&sort_by=updated'
-    # url=f'https://www.zhihu.com/api/v4/questions/{questionId}/answers?include=data[*].is_normal,admin_closed_comment,reward_info,is_collapsed,annotation_action,annotation_detail,collapse_reason,is_sticky,collapsed_by,suggest_edit,comment_count,can_comment,content,editable_content,attachment,voteup_count,reshipment_settings,comment_permission,created_time,updated_time,review_info,relevant_info,question,excerpt,is_labeled,paid_info,paid_info_content,relationship.is_authorized,is_author,voting,is_thanked,is_nothelp,is_recognized;data[*].mark_infos[*].url;data[*].author.follower_count,badge[*].topics;data[*].settings.table_of_content.enabled&limit=20&offset={offset}&sort_by=updated'
+    url = f'https://www.zhihu.com/api/v4/questions/{questionId}/answers?include=content&limit={PAGE_SIZE}&offset={offset}&sort_by=updated'
+    # url=f'https://www.zhihu.com/api/v4/questions/{questionId}/answers?include=data[*].is_normal,admin_closed_comment,reward_info,is_collapsed,annotation_action,annotation_detail,collapse_reason,is_sticky,collapsed_by,suggest_edit,comment_count,can_comment,content,editable_content,attachment,voteup_count,reshipment_settings,comment_permission,created_time,updated_time,review_info,relevant_info,question,excerpt,is_labeled,paid_info,paid_info_content,relationship.is_authorized,is_author,voting,is_thanked,is_nothelp,is_recognized;data[*].mark_infos[*].url;data[*].author.follower_count,badge[*].topics;data[*].settings.table_of_content.enabled&limit={PAGE_SIZE}&offset={offset}&sort_by=updated'
     res = get_text(url, 'utf-8')
-    questionTitle = parserQuestionTitle(res)
+    if page == 0:
+        parserQuestionTitle(res)
     ans, hasNext = parser_page(res)
-    return ans, hasNext, questionTitle
+    return ans, hasNext
 
 
-def downloadQuestion(questionId: int) -> ([ZhihuAnswer], str):
+def downloadQuestion(questionId: int) -> ([ZhihuAnswer]):
     ssg = RandomSleepSecondGen(2, 18)
     page = 0
     hasNext = True
     answers = []
-    questionTitle = None
     while hasNext:
         print(f'download answer of page {page}')
         try:
-            page_answers, hasNext, title_ = downloadQuestionPage(questionId, page)
-            questionTitle = questionTitle or title_
+            page_answers, hasNext = downloadQuestionPage(questionId, page)
             answers.extend(page_answers)
         except Exception as e:
             print_exc()
@@ -59,14 +61,18 @@ def downloadQuestion(questionId: int) -> ([ZhihuAnswer], str):
             ss = ssg.getNextSleepSecond()
             print(f'sleep for {ss} second')
             sleep(ss)
-    return answers, questionTitle
+    return answers
 
 
-def saveZhihuAnswers(questionId: int, fileDir: str, answers: [ZhihuAnswer], title: str):
+def saveZhihuAnswers(questionId: int, fileDir: str, answers: [ZhihuAnswer]):
     fileName = join(fileDir, 'zhihuAnswers_' + str(questionId) + '.md')
+    global questionTitle, questionUrl
+    titleMd = '# QUESTION  \n\n**' + questionTitle + '**  \n' + '[' + questionTitle + '](' + questionUrl + ')\n\n'
+
     with open(fileName, 'w', encoding='utf-8') as answerFile:
-        answerFile.write(title)
+        answerFile.write(titleMd)
         answerFile.write('\n')
+
         for i, answer in enumerate(answers):
             if i % 10 == 0:
                 title = '# PAGE ' + str(i // 10) + ' \n\n'
@@ -78,19 +84,17 @@ def saveZhihuAnswers(questionId: int, fileDir: str, answers: [ZhihuAnswer], titl
 
 
 def core(questionId: int):
-    res, title = downloadQuestion(questionId)
-    saveZhihuAnswers(questionId, 'D:/zhihu', res, title)
+    res = downloadQuestion(questionId)
+    saveZhihuAnswers(questionId, 'D:/zhihu', res)
 
 
 def main():
-    ids = [
-        1,
-        2,
-        3
-    ]
+    questionIdList = [
 
-    for id in ids:
-        core(id)
+        31728613
+                      ]
+    for qId in questionIdList:
+        core(qId)
     print('Hello world!')
 
 
