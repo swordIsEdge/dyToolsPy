@@ -9,7 +9,7 @@ from time import sleep
 
 from src.open.netTools.NetUtils import get_text
 from src.open.randomTools.randomGen import RandomSleepSecondGen
-from src.open.spider.zhihu.AnswerParser import parser_page
+from src.open.spider.zhihu.answerParser import parser_page
 from src.open.spider.zhihu.ZhihuAnswer import ZhihuAnswer
 from traceback import print_exc
 
@@ -45,7 +45,7 @@ def downloadQuestionPage(questionId: int, page: int) -> ([ZhihuAnswer], bool):
 
 
 def downloadQuestion(questionId: int) -> ([ZhihuAnswer]):
-    ssg = RandomSleepSecondGen(2, 18)
+    ssg = RandomSleepSecondGen(8, 20,4)
     page = 0
     hasNext = True
     answers = []
@@ -90,8 +90,8 @@ def core(questionId: int):
 
 def main():
     questionIdList = [
+        37005979
 
-        31728613
                       ]
     for qId in questionIdList:
         core(qId)
