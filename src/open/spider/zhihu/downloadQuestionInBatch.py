@@ -111,7 +111,7 @@ def downloadQuestionPage(questionId: int, page: int) -> ([ZhihuAnswer], bool):
 
 def downloadOfBatch(batch: int, questionId: int):
     print(f'download batch {batch}')
-    ssg = RandomSleepSecondGen(2, 10, 3)
+    ssg = RandomSleepSecondGen(6, 19, 3)
 
     pages = getBatchPageNums(batch)
     answers = []
@@ -125,6 +125,7 @@ def downloadOfBatch(batch: int, questionId: int):
             print_exc()
 
         if not hasNext:
+            print('answer reach end!')
             break
         else:
             ss = ssg.getNextSleepSecond()
@@ -159,7 +160,7 @@ def core(questionId: int):
 
 
 def main():
-    questionId = 313210162
+    questionId = 20810860
     core(questionId)
     print('Hello world!')
 

@@ -30,7 +30,7 @@ def get_data_requests_proxies(url: str):
 
 def get_data_requests(url: str):
     # print('start net request')
-    rp = requests.get(url, headers=headers,timeout=60)
+    rp = requests.get(url, headers=headers, timeout=60)
     # print('requst success')
     return rp.content
 
@@ -67,7 +67,9 @@ def _get_raw_data(url: str, func, time: int = 7):
             return raw_data
         except Exception as e:
             # print_exc()
-            sleep(1)
+            ss = 2 ** i
+            print(f'net error, sleep for {ss} seconds, error = ' + str(e))
+            sleep(ss)
             pass
     raise Exception("无法下载:" + url)
 
@@ -108,6 +110,7 @@ def download_encode_file(url: str, encodeStr: str, filename: str, useRequest: bo
                          useProxy: bool = False):
     data = get_text(url, encodeStr, useRequest, useProxy)
     save_text_file(data, filename)
+
 
 # def _downLoad(Url):
 #     UA = 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.140 Safari/537.36'
